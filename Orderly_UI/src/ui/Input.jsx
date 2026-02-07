@@ -1,6 +1,6 @@
 export default function Input({
   label,
-  name, // ✅ ADD THIS
+  name,
   type = "text",
   value,
   onChange,
@@ -8,16 +8,22 @@ export default function Input({
   error,
   required,
 }) {
+  const id = name; // ✅ single source of truth
+
   return (
     <div className="space-y-2">
       {label && (
-        <label className="block text-sm font-medium text-gray-700 tracking-wide">
+        <label
+          htmlFor={id} // ✅ FIX
+          className="block text-sm font-medium text-gray-700 tracking-wide"
+        >
           {label}
         </label>
       )}
 
       <input
-        name={name} // ✅ ADD THIS
+        id={id} // ✅ FIX
+        name={name}
         type={type}
         value={value}
         onChange={onChange}
@@ -39,7 +45,7 @@ export default function Input({
 
       {error && (
         <p className="text-sm font-medium text-red-500 flex items-center gap-1.5">
-          <span className="w-1.5 h-1.5 bg-red-500 rounded-full"></span>
+          <span className="w-1.5 h-1.5 bg-red-500 rounded-full" />
           {error}
         </p>
       )}

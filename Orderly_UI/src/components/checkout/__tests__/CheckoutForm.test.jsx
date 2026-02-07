@@ -1,10 +1,14 @@
-import { render, screen, fireEvent } from "@testing-library/react";
+import { render, screen, fireEvent, waitFor } from "@testing-library/react";
 import { MemoryRouter } from "react-router-dom";
-import CheckoutForm from "../CheckoutForm";
 import { vi } from "vitest";
+import CheckoutForm from "../CheckoutForm";
+import PlaceOrder from "../../../service/PlaceOrder";
 
-// mock useNavigate
+// --------------------
+// mocks
+// --------------------
 const mockNavigate = vi.fn();
+const mockRemoveItem = vi.fn();
 
 vi.mock("react-router-dom", async () => {
   const actual = await vi.importActual("react-router-dom");
@@ -14,6 +18,23 @@ vi.mock("react-router-dom", async () => {
   };
 });
 
+vi.mock("../../../service/PlaceOrder", () => ({
+  default: vi.fn(),
+}));
+
+vi.mock("../../cart/context/CartContext", () => ({
+  useCart: () => ({
+    cartItems: [
+      { id: 1, quantity: 2 },
+      { id: 2, quantity: 1 },
+    ],
+    removeItem: mockRemoveItem,
+  }),
+}));
+
+// --------------------
+// helpers
+// --------------------
 const renderCheckoutForm = () =>
   render(
     <MemoryRouter>
@@ -23,66 +44,52 @@ const renderCheckoutForm = () =>
 
 describe("CheckoutForm", () => {
   beforeEach(() => {
-    mockNavigate.mockClear();
+    vi.clearAllMocks();
   });
 
   test("renders checkout form fields", () => {
     renderCheckoutForm();
 
-    expect(screen.getByText("Delivery Details")).toBeInTheDocument();
-
     expect(
-      screen.getByPlaceholderText("Enter your full name"),
+      screen.getByRole("heading", { name: /delivery details/i }),
     ).toBeInTheDocument();
 
-    expect(
-      screen.getByPlaceholderText("10-digit mobile number"),
-    ).toBeInTheDocument();
+    expect(screen.getByLabelText(/full name/i)).toBeInTheDocument();
+    expect(screen.getByLabelText(/phone number/i)).toBeInTheDocument();
+    expect(screen.getByLabelText(/delivery address/i)).toBeInTheDocument();
 
     expect(
-      screen.getByPlaceholderText("Email for order updates"),
+      screen.getByRole("button", { name: /confirm & place order/i }),
     ).toBeInTheDocument();
-
-    expect(
-      screen.getByPlaceholderText("House no, building, street, area"),
-    ).toBeInTheDocument();
-
-    expect(screen.getByPlaceholderText("City")).toBeInTheDocument();
-    expect(screen.getByPlaceholderText("6-digit PIN code")).toBeInTheDocument();
   });
 
-  test("submits form and navigates to order status page", () => {
+  test("submits form and navigates to order status page", async () => {
+    PlaceOrder.mockResolvedValue({ orderId: "ORD-123" });
+
     renderCheckoutForm();
 
-    fireEvent.change(screen.getByPlaceholderText("Enter your full name"), {
+    fireEvent.change(screen.getByRole("textbox", { name: /full name/i }), {
       target: { value: "John Doe" },
     });
 
-    fireEvent.change(screen.getByPlaceholderText("10-digit mobile number"), {
+    fireEvent.change(screen.getByRole("textbox", { name: /phone number/i }), {
       target: { value: "9876543210" },
     });
 
-    fireEvent.change(screen.getByPlaceholderText("Email for order updates"), {
-      target: { value: "john@test.com" },
-    });
-
     fireEvent.change(
-      screen.getByPlaceholderText("House no, building, street, area"),
+      screen.getByRole("textbox", { name: /delivery address/i }),
       { target: { value: "221B Baker Street" } },
     );
-
-    fireEvent.change(screen.getByPlaceholderText("City"), {
-      target: { value: "Delhi" },
-    });
-
-    fireEvent.change(screen.getByPlaceholderText("6-digit PIN code"), {
-      target: { value: "110001" },
-    });
 
     fireEvent.click(
       screen.getByRole("button", { name: /confirm & place order/i }),
     );
 
-    expect(mockNavigate).toHaveBeenCalledWith("/order-status");
+    await waitFor(() => {
+      expect(mockNavigate).toHaveBeenCalledWith("/order-status/ORD-123");
+    });
+
+    expect(PlaceOrder).toHaveBeenCalledTimes(1);
+    expect(mockRemoveItem).toHaveBeenCalled();
   });
 });

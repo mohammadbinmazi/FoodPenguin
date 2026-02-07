@@ -1,14 +1,12 @@
 import Card from "../../ui/Card";
 
-const OrderSummary = ({ items }) => {
-  // ✅ FIX: quantity-aware subtotal
+const OrderSummary = ({ items = [] }) => {
   const subtotal = items.reduce(
-    (sum, item) => sum + item.price * item.quantity,
+    (sum, item) => sum + Number(item.price || 0) * Number(item.quantity || 1),
     0,
   );
 
   const deliveryFee = subtotal > 500 ? 0 : 49;
-
   const total = subtotal + deliveryFee;
 
   return (

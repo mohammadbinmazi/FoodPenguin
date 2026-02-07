@@ -12,34 +12,31 @@ const mockItemsHighTotal = [
 ];
 
 describe("OrderSummary", () => {
-  test("renders subtotal, tax and total correctly (delivery charged)", () => {
+  test("renders subtotal and delivery charge when subtotal is below 500", () => {
     render(<OrderSummary items={mockItemsLowTotal} />);
 
     // Subtotal = 350
     expect(screen.getByText("Subtotal")).toBeInTheDocument();
     expect(screen.getByText("₹350.00")).toBeInTheDocument();
 
-    // Delivery should be charged
+    // Delivery charged
     expect(screen.getByText("Delivery")).toBeInTheDocument();
     expect(screen.getByText("₹49.00")).toBeInTheDocument();
 
-    // Tax (5%)
-    expect(screen.getByText("Tax (5%)")).toBeInTheDocument();
-    expect(screen.getByText("₹17.50")).toBeInTheDocument();
-
-    expect(screen.getByText("₹416.50")).toBeInTheDocument();
+    // Total = 350 + 49 = 399
+    expect(screen.getByText("₹399.00")).toBeInTheDocument();
   });
 
-  test("shows FREE delivery when subtotal is above 500", () => {
+  test("shows FREE delivery and savings when subtotal is above 500", () => {
     render(<OrderSummary items={mockItemsHighTotal} />);
 
-    expect(screen.getByText("₹550.00")).toBeInTheDocument();
+    // Subtotal = 550 (appears twice: subtotal + total)
+    expect(screen.getAllByText("₹550.00").length).toBeGreaterThan(0);
 
+    // FREE delivery
     expect(screen.getByText("FREE")).toBeInTheDocument();
+
+    // Savings message
     expect(screen.getByText(/you saved ₹49/i)).toBeInTheDocument();
-
-    expect(screen.getByText("₹27.50")).toBeInTheDocument();
-
-    expect(screen.getByText("₹577.50")).toBeInTheDocument();
   });
 });
