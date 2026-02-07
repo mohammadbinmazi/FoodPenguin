@@ -4,9 +4,6 @@ import { vi } from "vitest";
 import MainMenu from "../MainMenu";
 import GetAllMenus from "../../../service/GetAllMenu";
 
-// --------------------
-// mocks
-// --------------------
 vi.mock("../../../service/GetAllMenu", () => ({
   default: vi.fn(),
 }));
@@ -45,9 +42,6 @@ vi.mock("../../layout/Header", () => ({
   ),
 }));
 
-// --------------------
-// mock data
-// --------------------
 const mockMenus = [
   { id: 1, name: "Margherita Pizza", category: "pizza" },
   { id: 2, name: "Veg Burger", category: "burger" },
@@ -55,9 +49,6 @@ const mockMenus = [
   { id: 4, name: "Caesar Salad", category: "specials" },
 ];
 
-// --------------------
-// helper
-// --------------------
 const renderMainMenu = () =>
   render(
     <MemoryRouter>

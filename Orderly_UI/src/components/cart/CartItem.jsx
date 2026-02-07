@@ -12,7 +12,6 @@ const CartItem = ({
 }) => {
   return (
     <Card className="flex flex-col gap-4 rounded-2xl bg-white p-5 shadow-sm sm:flex-row sm:items-center sm:justify-between">
-      {/* Item Info */}
       <div className="flex-1 min-w-0">
         <h3 className="truncate text-base font-semibold text-gray-900">
           {name}
@@ -64,7 +63,6 @@ const CartItem = ({
           </div>
         )}
 
-        {/* Remove */}
         <Button
           onClick={onRemove}
           className="px-3 py-2 text-sm font-medium bg-transparent text-gray-400 hover:bg-red-50 shadow-none"

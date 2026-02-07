@@ -7,10 +7,8 @@ import { useCart } from "../../components/cart/context/CartContext";
 const CartPreview = ({ onClose }) => {
   const navigate = useNavigate();
 
-  // ✅ Cart from context
   const { cartItems, increaseQty, decreaseQty, removeItem } = useCart();
 
-  // ✅ Correct calculations (quantity aware)
   const subtotal = cartItems.reduce(
     (sum, item) => sum + item.price * item.quantity,
     0,
@@ -19,7 +17,6 @@ const CartPreview = ({ onClose }) => {
   const deliveryFee = 0;
   const total = subtotal + deliveryFee;
 
-  // ✅ Total items count
   const totalItems = cartItems.reduce((sum, item) => sum + item.quantity, 0);
 
   const handleCheckout = () => {
@@ -29,7 +26,6 @@ const CartPreview = ({ onClose }) => {
 
   return (
     <div className="flex h-full flex-col">
-      {/* Header */}
       <div className="flex items-center justify-between border-b border-gray-100 px-6 py-5">
         <div>
           <h2 className="text-2xl font-bold text-gray-900 tracking-tight">
@@ -47,7 +43,6 @@ const CartPreview = ({ onClose }) => {
         </button>
       </div>
 
-      {/* Items */}
       <div className="flex-1 overflow-y-auto px-5 py-6 space-y-4">
         {cartItems.length === 0 ? (
           <div className="flex flex-col items-center justify-center h-full text-center px-4">
